@@ -132,6 +132,7 @@ $ext-options: (
 // Removes duplicates from a Sass list and joins them with commas
 //
 // @param {List} $selectors - List of selectors
+// @param {String} $placeholder - Used placeholder. Displayed on @warn.
 //
 // @example scss
 //   $list: html, .foo, body, .foo, form;
@@ -163,11 +164,15 @@ $ext-options: (
 // @param {String} $key - Key to budget and target a specific range of placeholders.
 //
 // @example scss
-//   $list: html, .foo, body, .foo, form;
-//   $list: ext-remove-duplicates($list);
-//   // html, .foo, body, form
+//   $map: (
+//     total: (
+//        %foo: html, div,
+//        ...
+//     )
+//   )
+//   $list: ext-list-map($list);
 //
-// @returns {List} $selectors - List of selectors without duplications
+// @returns {String} - Returns the info in a visual way as seen on ext-debug();
 @function ext-list-map(
     $map, 
     $key: total
@@ -235,16 +240,17 @@ $ext-options: (
 
 // Custom @extend mixin
 //
-// @param {List} $map - Map formed by a key and a map of (placeholder, selector list)
-// @param {String} $key - Key to budget and target a specific range of placeholders.
+// @param {String} $placeholder - Placeholder selector to extend (no %)
+// @param {String} $key - Key to budget related with the placeholder.
 // @param {String} $flag - Room for the !optional flag.
 //
 // @example scss
-//   $list: html, .foo, body, .foo, form;
-//   $list: ext-remove-duplicates($list);
-//   // html, .foo, body, form
+//   %foo{ color: black; }
+//   .something{
+//      @include ext(foo);
+//   }
+//   // No output, but the selectors will be stored in $ext-map.
 //
-// @returns {List} $selectors - List of selectors without duplications
 @mixin ext(
     $placeholder, 
     $key: total,
@@ -309,7 +315,7 @@ $ext-options: (
 }
 
 // Debug the results collected by ext() till being called.
-// IMPORTANT: Should be used at the end of your Sass file.
+// IMPORTANT: Should be used at the end of your Sass file in order to cover all your calls to ext().
 //
 // @param {String} $key-filter - If specified, limits debug to a single budget. If not, shows all.
 //
@@ -317,7 +323,6 @@ $ext-options: (
 //   @include ext-debug();
 //   // -> fixed debug info in body:after
 //
-// @returns {List} $selectors - List of selectors without duplications
 @mixin ext-debug(
     $key-filter: all
   ) {
