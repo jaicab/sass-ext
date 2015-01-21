@@ -33,14 +33,13 @@
 //
 // In 'total', set the maximun number of times you want a placeholder to be used.
 // If you want to add custom budgets, add another one right after total.
-// Total will always count all the placeholders, no matter the target.
+// Total is a keyword, so it will always count all the placeholders, no matter the target.
 //
 // Should be put with your other variables, before the mixins.
 // @type Map
 $ext-budget: (
-  total: 10,
-  heading: 8,
-  form: 5
+  total: 15,
+  heading: 12
 ) !default !global;
 
 
