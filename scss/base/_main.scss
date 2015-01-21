@@ -1,0 +1,79 @@
+
+
+html{
+    font:#{($base-font-size/16px)*1em}/#{$line-height-ratio} $base-font-family;
+    overflow-y:scroll;
+    color: $color-text;
+    background: $color-background;
+}
+
+
+body{
+	position: relative;
+}
+
+picture{
+	text-align: center;
+	display: inline-block;
+}
+
+img{
+	max-width: 100%;
+	border: none;
+}
+
+
+
+// Commonly used classes
+%clearfix{
+    zoom: 1; /* IE < 8 */
+
+	&:before,
+	&:after {
+	  content: ".";
+	  display: block;
+	  height: 0;
+	  overflow: hidden;
+	}
+	&:after {
+	    clear: both;
+	}
+}
+%ninja{
+	display: none !important;
+	visibility: hidden;
+}
+
+
+.content{
+	@extend %clearfix;
+	max-width: 50em;
+	margin: 0 auto;
+}
+
+.main .content{
+	padding: 0 1em;
+
+	@include mq($from: small) {
+		padding-left: 2em;
+		padding-right: 2em;
+	}
+}
+
+
+.fr{
+	float: right;
+}
+
+.fl{
+	float: left;
+}
+
+%center,
+.center{
+	text-align: center;
+}
+
+.small{
+	font-size: $base-font-size*0.8;
+}

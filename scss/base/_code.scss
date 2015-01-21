@@ -1,0 +1,37 @@
+%code{
+	//border: 1px solid #CCC;
+	color: darken($color-primary, 10%);
+	border-radius: .2em;
+	font-family: Courier, monospace;
+	display: inline-block;
+}
+
+%code--block{
+	background: darken(#f2f2f2, 5%);
+	padding: 1em;
+	margin: 1em 0 2em 0;
+	display: block;
+	tab-size: 4;
+  	white-space: pre-wrap;
+}
+
+
+%heading__code{
+	font-family: $alt-font-family;
+}
+
+
+pre{
+	@include ext(code);
+	@include ext(code--block);
+}
+
+code{
+	@include ext(code);
+}
+
+h1,h2,h3,h4,h5,h6{
+	code{
+		@include ext(heading__code);
+	}
+}

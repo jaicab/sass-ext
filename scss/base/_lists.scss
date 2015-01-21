@@ -1,0 +1,19 @@
+
+ul,
+ol{
+	font-size: 1em;
+	padding: {
+		top: 0;
+		bottom: .25em;
+		left: 1em;
+	}
+
+	li{
+		margin:{
+			top: 0;
+			right: 0;
+			bottom: .5em;
+			left: 0;
+		}
+	}
+}

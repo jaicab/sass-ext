@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>The ext(); mixin - Sets a selector budget and controls duplicates on Sass' @extend directive.</title>
+
+	<meta name="description" content="Sass @extend on steroids">
+
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="ext();">
+	<meta name="twitter:description" content="Sets a selector budget and controls duplicates on Sass' @extend directive.">
+	<meta name="twitter:creator" content="@jaicab_">
+
+	<meta property="og:title" content="The ext(); mixin" />
+	<meta property="og:url" content="http://jaicab.com/ext/" />
+
+	<link href='http://fonts.googleapis.com/css?family=Bigshot+One|Abril+Fatface' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body itemscope itemtype="http://schema.org/Thing">
+  <meta itemprop="url" content="http://jaicab.com/ext/">
+	
+
+	<header class="header--main">
+		<div class="content">
+			<div class="logo logo--big">
+				ext<span>()</span>;
+			</div>
+		</div>
+	</header>
+
+	<div class="content center">
+		<a download href="https://github.com/jaicab/ext/blob/master/_ext.scss" class="button--big">Download</a>
+	</div>
+
+	<main class="main">
+		<div class="content">
+			<h1>The <code>ext();</code> mixin sets a selector budget and controls duplicates on  Sass' <code>@extend</code> directive.</h1>
+
+			<nav>
+				<ul>
+					<li><a href="#start">Getting started</a></li>
+					<li><a href="#budgets">Targeted budgets</a></li>
+					<li><a href="#debug">Debug mode</a></li>
+					<li><a href="#options">Options</a></li>
+				</ul>
+			</nav>
+
+			<p>If you unserstand how Sass' <code>@extend</code> works, jump to <a href="#start">getting started</a>.</p>
+			<p>Basically, this Sass directive lets you <b>join selectors</b> so they share the same piece of CSS instead of coping the whole thing on each of them. And with <b>placeholders</b>, we can have chunks or even entire patterns of CSS without relating them with any specific selector.</p>
+<pre>
+// Sass
+
+// This is a placeholder. If not extended ever, it would not be outputted in the compiled CSS
+%foo1{
+	color: #000;
+}
+
+.foo2{
+	@extend(.foo1);
+}
+
+.foo3{
+	@extend(.foo1);
+	background: red;
+}
+</pre>
+			<p>Once you compile this, it would get you this:</p>
+<pre>
+// CSS Output
+
+.foo2,
+.foo3{
+	color: #000;	
+}
+
+.foo3{
+	background: red;
+}
+</pre>
+			<p>If you want a full explanation about how <code>@extend</code> and placeholders work, I'd recommend <a href="http://thesassway.com/intermediate/understanding-placeholder-selectors" rel="external">this article</a>.</p>
+
+			<p>The problem many developers have faced when using <code>@extend</code> is that, since you can extend as much as you want and have multiple extensions in the same selector, you can get bloats of selectors like so:</p>
+
+<pre>
+.foo_parent .foo,
+.foo_parent .foo h2,
+.heading span,
+.foo--mod .foo__child,
+.parent_of_foo--mod,
+.moar--selectors,
+...
+.moar--selectors{
+	color: #000;
+}
+</pre>
+			<p>As you can see, in this scenario it's not worth it to extend such a small block of CSS, because the conjunted selectors take more weight than the saved by the lines not copied on every selector.</p>
+
+			<p>So we need to be smart about how we use <code>@extend</code> and start doing things like <strong>setting a selector budget</strong>. But currently there is no way of doing that, is it? We can't just go to the CSS and count the selectors by hand!</p>
+
+			<p>Well, <code>ext();</code> will do this and much more for you. It'll give you the functionality and control you would expect from <code>@extend</code>. This is how it looks like:</p>
+<pre>
+$ext-budget: (
+	total: 10
+);
+
+%foo{ color: #000; }
+
+html{
+	@include ext(foo);
+}
+</pre>
+			<p>Now thanks to the use of this plugin we can do way more stuff than if we were using the regular <code>@extend</code> directive, like:</p>
+			<ul>
+				<li>Set an selector budget.</li>
+				<li>Know the selectors that are using each placeholder.</li>
+				<li>Throw warnings if you are extending the wrong way.</li>
+			</ul>
+
+			<h2><a href="#start" name="start">Getting started</a></h2>
+			<p>Using <code>ext();</code> is really straightforward. The only dependency is <strong>Sass 3.4+</strong>. First of all, you will need to <a href="https://github.com/jaicab/ext/blob/master/_ext.scss" rel="external">download _ext.scss</a> and import it in your project.</p>
+			<p>Then, on you defaults file (<code>_defaults.scss</code>, <code>_vars.scss</code>, etc.) you need to set up your <strong>selector budget</strong> (<code>$ext-budget</code>).
+<pre>
+$ext-budget: (
+	total: 5
+);
+</pre>
+			<p>Here you must set the <b>maximun number</b> of selectors you want any placeholder to be limited to be extended. And you are ready to go! Start extending your placeholders like so:</p>
+<pre>
+%foo{
+	color: #000;
+}
+
+@include ext(foo);
+</pre>
+			<p>By default (you can change the <a href="#options">options</a> though), <code>ext();</code> will throw you a warning (using Sass <code>@warn</code>) when:</p>
+			<ul>
+				<li>A placeholder has been used more than the times set in the budget.</li>
+				<li>A selector has been extended more than once.</li>
+			</ul>
+			<p><b>NOTE:</b> Please, bear in mind that extending classes is not supported since it goes against the idea of this mixin. You should only use placeholders.</p>
+
+
+			<h2><a href="#budgets" name="budgets">Targeted budgets</a></h2>
+			<p>Although <code>total</code> is the initial budget, you may want to have different budgets for different placeholders, like headings, which easily have 6 selectors as a minimun. Therefore can add more to <code>$ext-budget</code> like so:</p>
+<pre>
+$ext-budget: (
+	total: 5,
+	headings: 8,
+	forms: 10
+);
+</pre>
+			<p>By default, <code>ext();</code> will <b>always count an extension in the <code>total</code> budget</b> to get a generic idea all across the site. If you don't want this to happen, just remove it from the budget map.</p>
+			<p>If you want an extension to count as part of another budget too, simply add it as another parameter when you extend the placeholder.</p>
+<pre>
+@include ext(foo, headings);
+</pre>
+			<p>These budgets will also be reflected in the <a href="#debug">debug</a>.</p>
+			<p><b>FLAGS:</b> Although it is not recommended for this mixin, you can add the <code>!optional</code> flag as a third parameter.</p>
+
+<pre>
+@include ext(foo, headings, !optional);
+</pre>
+			<p>If you want a summary of all the budgets and their related placeholders and use, go on and enable the <a href="#debug">debug mode</a>.</p>
+
+
+
+			<h2><a href="#debug" name="debug">Debug mode</a></h2>
+			<p>You can enable the visual, fantastic debug mode by adding the following <b>after all your <code>@import</code></b>:</p>
+<pre>
+@include ext-debug();
+</pre>
+			<p>Using <code>body:after</code> you will get a complete report, similar to this.</p>
+
+
+			<div class="debug-demo">
+				# ext() v1.0 jaicab.com/ext/
+				<p>
+					All good! - 0 of 14 total (15, 1/210 ratio)
+				</p>
+				<p>
+					⚠ HEY! - 2 of 2 heading (9, 20/18 ratio)
+					<br/>10/9 - %heading => .heading for: 'h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4',
+					<br/>10/9 - %header__heading => .header__heading for: 'h1, h2, h3,...
+				</p>
+			</div>
+
+			<p>By default, all the budgets summaries and their exceeded placeholders are shown. You can filter this by budget key in the <code>ext-debug()</code> parameter to limit the results to it.</p>
+
+<pre>
+@include ext-debug(headings);
+</pre>
+
+			<p>You can also <a href="#options">change the options</a> to see all the placeholders even if they are under the budget, or even limit the budget summaries shown to the ones that have budget-exceeding placeholders.</p>
+
+
+			<h2><a href="#options" name="options">Options</a></h2>
+
+			<p>If you want to change <code>ext();</code> behaviour you can play with the options. Just include them in your defaults file:</p>
+
+<pre>
+$ext-default-options: (
+  warn-over: true,
+  warn-duplicates: true,
+  over-only: true,
+  show-all: true
+);
+</pre>
+			<p>There is no need yo use them all or to keep them in that same order. Changing these values would affect in:</p>
+			<ul>
+				<li><code>warn-over</code> {Bool} (Default: true): Warns you when a placeholder has been used more than budgeted.</li>
+				<li><code>warn-duplicates</code> {Bool} (Default: true): Warn when you use a placeholder in the same selector more than once.</li>
+				<li><code>over-only</code> {Bool} (Default: true): For placeholders on debug. Only show placeholders over the budget.</li>
+				<li><code>show-all</code> {Bool} (Default: true): For budgets debug. List an expanded version of all the used budgets, no matter of the results.</li>
+			</ul>
+
+			<p>If you want to contribute to this, please <a href="https://github.com/jaicab/ext">open an issue</a> or send me <a href="https://github.com/jaicab/ext">a pull request.</a></p>
+			
+
+		</div>
+	</main>
+
+	
+	<aside class="share">
+		<div class="content">
+			<iframe class="share__button" src="http://ghbtns.com/github-btn.html?user=jaicab&amp;repo=ext&amp;type=watch&amp;count=true"
+  allowtransparency="true" frameborder="0" scrolling="0" width="130" height="20"></iframe>
+    	    <iframe class="share__button" src="http://ghbtns.com/github-btn.html?user=jaicab&amp;type=follow&amp;count=true"
+  allowtransparency="true" frameborder="0" scrolling="0" width="130" height="20"></iframe>
+  		</div>
+	</aside>
+
+	<footer class="footer--main">
+		<div class="content">
+			Made with &hearts; by <a href="http://jaicab.com" rel="external">Jaime Caballero</a>
+		</div>
+	</footer>
+
+
+</body>
+</html>

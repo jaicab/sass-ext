@@ -1,0 +1,56 @@
+
+
+%button{
+	background: $color-primary;
+	color: $color-background;
+}
+
+%button--big{
+	padding: 1em 1.5em;
+	text-align: center;
+	border-radius: .2em;
+	margin: {
+		top: -1em;
+		right: 2em;
+		left: 2em;
+	}
+	border: .1em solid $color-background;
+	background: darken($color-primary, 10%);
+	font-weight: bold;
+	
+	display: inline-block;
+	font-size: 1em;
+
+	&:hover,
+	&:focus,
+	&:active{
+		background: darken($color-primary, 20%);
+	}
+
+	@include mq($from: medium) {
+		font-size: 1.8em;
+		padding: .75em 1.25em;
+		text-shadow: .05em .05em 0 darken($color-primary, 20%);
+		margin-top: -2em;
+		position: relative;
+		top: -.2em;
+
+		@include gradient(darken($color-primary, 5%), darken($color-primary, 20%));
+		transition: all .25s cubic-bezier(.26,1.26,.72,1.09);	
+
+		&:hover,
+		&:focus,
+		&:active{
+			transform: scale(1.2);
+			color: $color-background;
+			text-decoration: none;
+			@include gradient(darken($color-primary, 5%), darken($color-primary, 20%));
+		}
+	}
+}
+
+
+.button--big{
+	@include ext(button);
+	@include ext(button--big);
+}

@@ -1,0 +1,23 @@
+
+
+%footer{
+	@include ext(center);
+	font-size: .9em;
+	margin-top: 1em;
+
+	.content{
+		background: $color-primary;
+		padding: 2em;
+		border-radius: .5em .5em 0 0;
+		color: $color-background;
+
+		a{
+			color: $color-background !important;
+		}
+	}
+}
+
+
+.footer--main{
+	@include ext(footer);
+}

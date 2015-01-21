@@ -1,0 +1,35 @@
+
+
+%logo{
+	font-size: 4em;
+	color: $color-logo;
+	font-weight: normal;
+	padding-bottom: .35em;
+	padding-top: .15em;
+	font-family: $alt-font-family;
+	text-shadow: .02em .04em 0 darken($color-primary, 20%);
+
+	span{
+		color: $color-logo-detail;
+	}
+
+	@include mq($from: small) {
+		font-size: 6em;
+	}
+	@include mq(small, medium, $and: '(orientation: landscape)') {
+		font-size: 4em !important;
+	}
+
+	@include mq($from: smallish) {
+		font-size: 8em;
+	}
+	@include mq($from: medium) {
+		font-size: 12em;
+	}
+}
+
+
+.logo{
+	@include ext(logo);
+}
+

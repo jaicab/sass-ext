@@ -1,0 +1,277 @@
+
+
+form{
+	padding-bottom: 1em;
+	overflow: hidden;
+}
+
+
+// GENERIC
+%rounded-grey-box{
+	border: $input-border-width/2 solid #fff;
+	padding: .7em;
+	background: $color-background;
+	color: $color-text;
+	border-radius: 0;
+}
+
+
+input,
+button,
+textarea,
+select,
+.button{
+	@extend %rounded-grey-box;
+
+    -webkit-appearance:none;
+	display: inline-block;
+	width: 100%;
+
+	font: inherit;
+	outline: none;
+	
+	transition: .25s box-shadow, .25s border;
+
+	&:disabled{
+		color: #A9A9A9;
+		background: #ECECEC;
+	}
+
+	&:focus{
+		border-color: $color-primary;
+	}
+}
+
+// SELECT
+
+select{
+	width: 100%;
+	display: block;
+	padding-right: 2em;
+}
+// Hide the select arrow on IE10+
+select::-ms-expand {
+    display: none;
+}
+
+.select{
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+
+// TEXTAREA
+
+textarea{
+	resize: vertical;
+	min-height: 7em;
+}
+
+
+// Icon on the right
+.select:after{
+	content: "\25bc";
+	color: $color-primary;
+	display: inline-block;
+	padding: 0 .75em;
+	speak: none;
+	pointer-events: none;
+	font-size: .75em;
+
+	line-height: 2.5em;
+	position: absolute;
+	top: .1em;
+	bottom: .1em;
+	right: .1em;
+	background: #fff;
+	border: .5em solid $color-background;
+}
+
+// BUTTONS
+
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+button,
+.button{
+	display: inline-block;
+	width: auto;
+	padding: .75em 1em;
+	margin: 0 .1em;
+	box-shadow: none !important;
+	
+	transition: .25s all;
+	
+	border: none;
+	color: #fff;
+	background: $color-primary;
+	background: auto-gradient($color-primary);
+	font-weight: 700;
+
+	&:hover{
+		color: $color-link;
+		cursor: pointer;
+	}
+}
+
+.button--full{
+	display: block;
+	margin-bottom: .1em;
+
+	& + &{
+		margin-top: .5em;
+	}
+}
+
+.button--download{
+	background: $color-success;
+	background: auto-gradient($color-success);
+	text-align: center;
+}
+
+
+// CHECKBOX AND RADIO
+input[type="radio"],
+input[type="checkbox"]{
+	border: none;
+	background: none;
+	min-width: 0;
+	width: auto;
+	display: inline;
+}
+
+:root input[type="radio"].radio,
+:root input[type="checkbox"].checkbox{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: none;
+}
+input[type="radio"].radio + label.radio,
+input[type="checkbox"].checkbox + label.checkbox{
+	display: inline-block;
+	min-width: 12em;
+	padding-bottom: .5em;
+
+	&::#{$checkbox-position}{
+		content: '';
+		display: inline-block;
+		position: relative;
+		top: -.1em;
+		float: right;
+
+		line-height: 1;
+		margin: 0 .5em;
+		width: 1.5em;
+		height: 1.5em;
+		border-radius: 0.25em;
+		border: .2em solid $color-primary;
+		background: #FFF;
+		transition: .25s background;
+	}
+
+	&:hover::#{$checkbox-position}{
+		cursor: pointer;
+	}
+}
+
+// Fill if checked
+input[type="radio"].radio:checked + label.radio::#{$checkbox-position},
+input[type="checkbox"].checkbox:checked + label.checkbox::#{$checkbox-position}{
+	background: $color-primary;
+}
+
+// Bigger radius for radio input
+input[type="radio"].radio + label.radio::#{$checkbox-position}{
+	border-radius: 1em;
+}
+
+// Once radio is checked, no need for pointer cursor
+input[type="radio"].radio:checked + label.radio:hover::#{$checkbox-position}{
+	cursor: auto;
+}
+
+// RANGE
+
+%input--range,
+:root input[type="range"]{
+	-webkit-appearance:none !important;
+	position: relative;
+	line-height: 0;
+	height: .85em;
+	width: 100%;
+	padding: 0;
+	margin: 1em 0 .5em 0;
+}
+
+@mixin range-thumb{
+	-webkit-appearance:none !important;  
+	
+	line-height: 0;
+	margin: 0;
+	width: 2em;
+	height: 2em;
+	border-radius: 1em;
+	border-radius: 50%;
+	border: none !important;
+	background: $color-primary;
+}
+
+input[type=range]::-moz-range-thumb{
+	@include range-thumb();
+}
+input[type=range]::-webkit-slider-thumb{
+	@include range-thumb();
+}
+input[type=range]::-ms-thumb{
+	@include range-thumb();
+}
+
+// Extending range styles for jQuery UI.
+.ui-slider{
+	@extend %rounded-grey-box;
+	@extend %input--range;
+	position: relative;
+	text-align: left;
+}
+.ui-slider .ui-slider-handle {
+	@include range-thumb();
+	position: absolute;
+	z-index: 2;
+	cursor: default;
+	-ms-touch-action: none;
+	touch-action: none;
+	outline: none;
+}
+.ui-slider .ui-slider-range {
+	position: absolute;
+	z-index: 1;
+	font-size: .7em;
+	display: block;
+	background: lighten($color-primary, 20%);
+}
+
+
+/* support: IE8 - See #6727 */
+.ui-slider.ui-state-disabled .ui-slider-handle,
+.ui-slider.ui-state-disabled .ui-slider-range {
+	filter: inherit;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	top: -.7em;
+}
+// Fix for the second handler
+.ui-slider-horizontal .ui-slider-handle:last-child{
+	margin-left: -1.8em;
+}
+.ui-slider-horizontal .ui-slider-range {
+	top: 0;
+	height: 100%;
+}
+.ui-slider-horizontal .ui-slider-range-min {
+	left: 0;
+}
+.ui-slider-horizontal .ui-slider-range-max {
+	right: 0;
+}

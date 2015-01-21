@@ -1,0 +1,15 @@
+%debug{
+        background: $color-primary;
+        background: rgba($color-primary, 0.9);
+        color: #f2f2f2;
+        font-size: small-caption;
+        padding: 2em 2em 1em 2em;
+        text-shadow: 1px 1px 0 saturate(#069, 20%);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: .9em;
+        display: block;
+}
+
+.debug-demo{
+        @include ext(debug);
+}
