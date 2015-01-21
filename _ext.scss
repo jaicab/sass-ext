@@ -17,7 +17,7 @@
 //
 //   @include ext(my_placeholder);
 //
-// Then all the placeholders will be counted and you will be warned if surpass the budget.
+// Then all the placeholders will be counted and you will be warned if any of them surpass the budget.
 //
 // If you want to create targeted budgets, add another budget to the $ext-budget map.
 // Then use it like so:
