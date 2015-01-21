@@ -1,0 +1,5 @@
+{
+  "name": "ext",
+  "description": "The ext(); mixin sets a selector budget and controls duplicates on Sass' @extend directive.",
+  "tags": ["sass", "extend", "placeholder", "budget", "selector"]
+}

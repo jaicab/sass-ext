@@ -1,0 +1,27 @@
+{
+  "name": "ext",
+  "description": "The ext(); mixin sets a selector budget and controls duplicates on Sass' @extend directive.",
+  "keywords": [
+    "sass",
+    "extend",
+    "placeholder",
+    "budget",
+    "selector"
+  ],
+  "main": "_ext.scss",
+  "author": "Jaime Caballero",
+  "ignore": [
+    "**/.*",
+    "sache.json"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaicab/ext"
+  }
+}
