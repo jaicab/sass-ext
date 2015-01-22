@@ -65,11 +65,11 @@
 }
 
 .foo2{
-	@extend(.foo1);
+	@extend .foo1;
 }
 
 .foo3{
-	@extend(.foo1);
+	@extend .foo1;
 	background: red;
 }
 </pre>
@@ -130,11 +130,11 @@ html{
 <pre>
 bower install ext --save
 </pre>
-			If you don't use Bower, you can <a href="https://github.com/jaicab/ext/blob/master/_ext.scss" rel="external">download _ext.scss</a>. Once you got it, import it in your project.</p>
-			<p>Then, on you defaults file (<code>_defaults.scss</code>, <code>_vars.scss</code>, etc.) you need to set up your <strong>selector budget</strong> (<code>$ext-budget</code>).
+			If you don't use Bower, you can <a href="https://github.com/jaicab/ext/blob/master/_ext.scss" rel="external">download _ext.scss</a>. Once you got it, import it into your project.</p>
+			<p>Then, on your defaults file (<code>_defaults.scss</code>, <code>_vars.scss</code>, etc.) you need to set up your <strong>selector budget</strong> (<code>$ext-budget</code>).
 <pre>
 $ext-budget: (
-	total: 5
+	total: 15
 );
 </pre>
 			<p>Here you must set the <b>maximun number</b> of selectors you want any placeholder to be limited to be extended. And you are ready to go! Start extending your placeholders like so:</p>
@@ -143,7 +143,9 @@ $ext-budget: (
 	color: #000;
 }
 
-@include ext(foo);
+.something{
+	@include ext(foo);
+}
 </pre>
 			<p>By default (you can change the <a href="#options">options</a> though), <code>ext();</code> will throw you a warning (using Sass <code>@warn</code>) when:</p>
 			<ul>
@@ -157,8 +159,8 @@ $ext-budget: (
 			<p>Although <code>total</code> is the initial budget, you may want to have different budgets for different placeholders, like headings, which easily have 6 selectors as a minimun. Therefore can add more to <code>$ext-budget</code> like so:</p>
 <pre>
 $ext-budget: (
-	total: 5,
-	headings: 8,
+	total: 15,
+	headings: 12,
 	forms: 10
 );
 </pre>
