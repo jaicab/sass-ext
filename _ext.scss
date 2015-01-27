@@ -1,8 +1,8 @@
-@charset "UTF-8"; 
+@charset "UTF-8";
 
 
 // -------------------------------------------------------------------------------------
-//                              
+//
 //                            ext(); v1.0 - @extend on a budget
 //
 //                                     jaicab.com/ext/
@@ -38,9 +38,9 @@
 // Should be put with your other variables, before the mixins.
 // @type Map
 $ext-budget: (
-  total: 15,
-  heading: 12
-) !default !global;
+  'total': 15,
+  'heading': 12
+) !default;
 
 
 // Options
@@ -54,54 +54,53 @@ $ext-budget: (
 // Should be put with your other variables, before the mixins.
 // @type Map
 $ext-options: (
-  warn-over: true,
-  warn-duplicates: true,
-  over-only: true,
-  show-all: true
-) !default !global;
+  'warn-over': true,
+  'warn-duplicates': true,
+  'over-only': true,
+  'show-all': true
+) !default;
 
 
 //Initiates the variables necessary for ext() to work
 @mixin ext-init() {
 
-  // OPTIONS 
-  @if not variable-exists(ext-opt){
+  // OPTIONS
+  @if not variable-exists('ext-opt') {
     // Default options
     $ext-opt: (
-      warn-over: true,
-      warn-duplicates: true,
-      over-only: true,
-      show-all: true
+      'warn-over': true,
+      'warn-duplicates': true,
+      'over-only': true,
+      'show-all': true
     ) !global;
-    
+
     // If the developer has set new options($ext-options), merge them with the defaults.
-    @if variable-exists(ext-options) {
+    @if variable-exists('ext-options') {
       $ext-opt: map-merge($ext-opt, $ext-options) !global;
     }
   }
 
   // FOR EXT()
   // If there is no $ext-budget variable
-  @if not variable-exists(ext-budget){
-    @warn "You must set you placeholder budgets before using ext().";
+  @if not variable-exists('ext-budget') {
+    @warn 'You must set you placeholder budgets before using ext().';
   }
 
   // Or no budgets specified
-  @elseif not length($ext-budget) {
-    @warn "You must specify at least one budget. Use 'total' by default";
+  @else if not length($ext-budget) {
+    @warn 'You must specify at least one budget. Use `total` by default.';
   }
 
   // If the placeholder collection hasn't still been created.
-  @elseif not variable-exists(ext-map){
+  @else if not variable-exists('ext-map') {
     // Create map
     $ext-map: () !global;
 
-    @each $key, $budget in $ext-budget{
-      $pair: ($key: ());
-      $ext-map: map-merge($ext-map, $pair) !global;
+    @each $key, $budget in $ext-budget {
+      $ext-map: map-merge($ext-map, ($key: ())) !global;
     }
   }
-  
+
 }
 
 
@@ -115,16 +114,14 @@ $ext-options: (
 //
 // @returns {List} $selectors - List of selectors without duplications
 @function ext-get-option($option) {
-  
   $ret: ();
 
   @if not map-has-key($ext-opt, $option) {
-    @warn "The option #{$option} is not defined or part of the options.";
-  }
-  @else{
+    @warn 'The option `#{$option}` is not defined or part of the options.';
+  } @else {
     $ret: map-get($ext-opt, $option);
   }
-  
+
   @return $ret;
 }
 
@@ -141,19 +138,17 @@ $ext-options: (
 //
 // @returns {List} $selectors - List of selectors without duplications
 @function ext-remove-duplicates($selectors, $placeholder) {
-  
   $ret: ();
-  
+
   @each $selector in $selectors {
     @if not index($ret, $selector) {
-        $ret: append($ret, $selector, comma);
-    }
-    @elseif ext-get-option(warn-duplicates) {
+      $ret: append($ret, $selector, 'comma');
+    } @elseif ext-get-option('warn-duplicates') {
       // Warn if duplicated selector
-      @warn "The selector '#{$selector}' has already been extended for the %#{$placeholder} placeholder.";
+      @warn 'The selector `#{$selector}` has already been extended for the `%#{$placeholder}` placeholder.';
     }
   }
-  
+
   @return $ret;
 }
 
@@ -174,14 +169,13 @@ $ext-options: (
 //
 // @returns {String} - Returns the info in a visual way as seen on ext-debug();
 @function ext-list-map(
-    $map, 
-    $key: total
+    $map,
+    $key: 'total'
   ){
-
   $ret: '';
 
   // If it's been extended
-  @if length($map)>0 {
+  @if length($map) > 0 {
 
     // List the key
     $over-budget: 0;
@@ -190,48 +184,33 @@ $ext-options: (
 
     // Loop through the placeholders
     @each $placeholder, $selectors in $map {
+      // Count selectors
+      $count-selectors: length($selectors);
 
-        // Count selectors
-        $count-selectors: length($selectors);
+      // List the placeholder and show use respect budget
+      @if length($selectors) > map-get($ext-budget, $key) or not ext-get-option('over-only') {
+        $ret-loop: '#{$ret-loop}#{length($selectors)}/#{map-get($ext-budget, $key)} - %#{$placeholder}';
+      }
 
-        // List the placeholder and show use respect budget
-        @if length($selectors)>map-get($ext-budget, $key) or not ext-get-option(over-only){
-          $ret-loop: "#{$ret-loop}" + "#{length($selectors)}/#{map-get($ext-budget, $key)} - %#{$placeholder}";
+      // If current placeholder is under the budget
+      @if length($selectors) <= map-get($ext-budget, $key) {
+        // And we want to see it
+        @if not ext-get-option(over-only){
+          // Format for the ones under budget
+          $ret-loop: '#{$ret-loop}: `#{$selectors}`,\A';
         }
-
-        // If current placeholder is under the budget
-        @if length($selectors)<=map-get($ext-budget, $key) {
-          // And we want to see it
-          @if not ext-get-option(over-only){
-            // Format for the ones under budget
-            $ret-loop: "#{$ret-loop}" + ": '" + "#{$selectors}" + "',\A";  
-          }
-        }
+      } @else {
         // Always show the ones over the budget
-        @else{
-          // Format for over budget
-          $ret-loop: "#{$ret-loop}" + " => .#{$placeholder} for: '" + "#{$selectors}" + "',\A";  
-          $over-budget: $over-budget+1;
-        }
-        
+        // Format for over budget
+        $ret-loop: '#{$ret-loop} => .#{$placeholder} for: `#{$selectors}`,\A';
+        $over-budget: $over-budget + 1;
+      }
     }
 
     $ext-ratio: (map-get($ext-budget, $key) * length($map));
-
-    // If this budget is all good
-    @if $over-budget<1 {
-      // And we want to see the good ones
-      @if ext-get-option(show-all) {
-        $ret: "All good! - #{$over-budget} of #{length($map)} #{$key} (#{map-get($ext-budget, $key)}, #{$count-selectors}/#{$ext-ratio} ratio)";
-        $ret: "#{$ret} \A #{$ret-loop} \A";    
-      }
-    }
-    @else{
-      $ret: "\26A0  HEY! - #{$over-budget} of #{length($map)} #{$key} (#{map-get($ext-budget, $key)}, #{$count-selectors}/#{$ext-ratio} ratio)";
-      $ret: "#{$ret} \A #{$ret-loop} \A";    
-    }
-
-
+    $prefix: if($over-budget < 1 and ext-get-option('show-all'), 'All good!', '\26A0  HEY!');
+    $ret: '#{$prefix} - #{$over-budget} of #{length($map)} #{$key} (#{map-get($ext-budget, $key)}, #{$count-selectors}/#{$ext-ratio} ratio)';
+    $ret: '#{$ret} \A #{$ret-loop} \A';
   }
 
   @return $ret;
@@ -252,30 +231,28 @@ $ext-options: (
 //   // No output, but the selectors will be stored in $ext-map.
 //
 @mixin ext(
-    $placeholder, 
-    $key: total,
+    $placeholder,
+    $key: 'total',
     $flag: ''
   ) {
-  
+
   // If there is a parent, it's extendable
   @if not & {
-    @warn "You can't extend outside a selector.";
-  }
-
-  @else{  
+    @warn 'You can\'t extend outside a selector.';
+  } @else {
 
     // Extend would return an error if the placeholder doesn't exist
     @extend %#{$placeholder} #{$flag};
 
     // Check that the budget is there and handle in a variable
-    @if not variable-exists(ext-map){
-      @include ext-init();  
+    @if not variable-exists('ext-map'){
+      @include ext-init();
     }
+
     @if map-has-key($ext-map, $key) {
       $ext-map-key: map-get($ext-map, $key) !global;
-    }
-    @else{
-      @warn "The budget #{$key} hasn't been specified. Please add it to your $ext-budget list.";
+    } @else{
+      @warn 'The budget `#{$key}` hasn\'t been specified. Please add it to your $ext-budget list.';
     }
 
     // If we don't, initialize placeholder to the current selectors
@@ -284,7 +261,7 @@ $ext-options: (
     // If we have the budget, add one
     @if map-has-key($ext-map-key, $placeholder) {
       // Get the current selectors, join them with the new ones and remove the duplicates
-      $placeholder-selectors: join( map-get($ext-map-key, $placeholder), &, comma);
+      $placeholder-selectors: join(map-get($ext-map-key, $placeholder), &, 'comma');
     }
 
     // WARN IF DUPLICATED SELECTORS
@@ -295,18 +272,18 @@ $ext-options: (
     $ext-map: map-merge($ext-map, ($key: $ext-map-key)) !global;
 
     // Update the total one
-    @if $key!="total" and map-has-key($ext-map, total) {
-      $ext-map-key: map-merge($ext-map-key, (total: $placeholder-selectors)) !global;
-      $ext-map: map-merge($ext-map, (total: map-merge(map-get($ext-map, total), ($placeholder: $placeholder-selectors)))) !global;
+    @if $key != 'total' and map-has-key($ext-map, 'total') {
+      $ext-map-key: map-merge($ext-map-key, ('total': $placeholder-selectors)) !global;
+      $ext-map: map-merge($ext-map, ('total': map-merge(map-get($ext-map, 'total'), ($placeholder: $placeholder-selectors)))) !global;
     }
 
     // Check if it's been overused
-    @if length($ext-map-key)>0 {
+    @if length($ext-map-key) > 0 {
       // If there are more placeholder than estimated, warn the user
       //@warn #{map-get($ext-map-key, $placeholder)};
-      @if (length(map-get($ext-map-key, $placeholder)) > map-get($ext-budget, $key)) {
-        @if ext-get-option(warn-over) {
-          @warn "%#{$placeholder} has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check '"+&+"' to prevent that. ";
+      @if length(map-get($ext-map-key, $placeholder)) > map-get($ext-budget, $key) {
+        @if ext-get-option('warn-over') {
+          @warn '`%#{$placeholder}` has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check `#{&}` to prevent that.';
         }
       }
     }
@@ -324,49 +301,46 @@ $ext-options: (
 //   // -> fixed debug info in body:after
 //
 @mixin ext-debug(
-    $key-filter: all
+    $key-filter: 'all'
   ) {
 
-    body:after {
-        background: #635c92;
-        background: rgba(#635c92, 0.9);
-        color: #f2f2f2;
-        font-size: small-caption;
-        padding: 2em 2em 1em 2em;
-        text-shadow: 1px 1px 0 saturate(#069, 20%);
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: .9em;
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: 100;
-        display: block;
+  body:after {
+    background: #635c92;
+    background: rgba(#635c92, 0.9);
+    color: #f2f2f2;
+    font-size: small-caption;
+    padding: 2em 2em 1em 2em;
+    text-shadow: 1px 1px 0 saturate(#069, 20%);
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-size: .9em;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    display: block;
 
-        // Loop through the keys
-        $result: '# ext() v1.0       jaicab.com/ext/\A\A';
-        // If there's a key filter
-        @if $key-filter!=all {
-          @if not map-has-key($ext-map, $key-filter) {
-            @warn "Seems like the key '#{$key-filter}' is not on the budget or hasn't been used with ext().";
-          }
-          @else{
-            $result: ext-list-map($map, $key);
-          }
-        }
+    // Loop through the keys
+    $result: '# ext() v1.0       jaicab.com/ext/\A\A';
 
-        @else{
-          // Show all of them
-          @each $key, $map in $ext-map {
-            $result: "#{$result}" + ext-list-map($map, $key);
-          }
-
-        }
-        @if $result=='# ext() v1.0       jaicab.com/ext/\A\A'{
-          $result: "#{$result}" + " Nothing to see here. Play with show-all and over-only options to see everything.\A\A ";
-        }
-
-        content: $result;
-        white-space: pre-wrap;
-
+    // If there's a key filter
+    @if $key-filter != 'all' {
+      @if not map-has-key($ext-map, $key-filter) {
+        @warn 'Seems like the key `#{$key-filter}` is not on the budget or hasn\'t been used with ext().';
+      } @else {
+        $result: ext-list-map($map, $key);
+      }
+    } @else {
+      // Show all of them
+      @each $key, $map in $ext-map {
+        $result: $result + ext-list-map($map, $key);
+      }
     }
+
+    @if $result == '# ext() v1.0       jaicab.com/ext/\A\A'{
+      $result: '#{$result} Nothing to see here. Play with show-all and over-only options to see everything.\A\A ';
+    }
+
+    content: $result;
+    white-space: pre-wrap;
+  }
 }
