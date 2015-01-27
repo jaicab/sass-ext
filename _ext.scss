@@ -46,6 +46,7 @@ $ext-budget: (
 /// Options
 /// Should be put with your other variables, before the mixins.
 ///
+/// @prop {Bool} strict [false] - For strict development. Overrides the optional warnings and throws and error on all bad scenarios.
 /// @prop {Bool} warn-over [true] - Warns you when a placeholder has been used more than budgeted.
 /// @prop {Bool} warn-duplicates [true] - Warn when you use a placeholder in the same selector more than once.
 /// @prop {Bool} over-only [true] - For placeholders on debug. Only show placeholders over the budget.
@@ -53,6 +54,7 @@ $ext-budget: (
 ///
 /// @type Map
 $ext-options: (
+  'strict': false,
   'warn-over': true,
   'warn-duplicates': true,
   'over-only': true,
@@ -66,6 +68,7 @@ $ext-options: (
   @if not variable-exists('ext-opt') {
     // Default options
     $ext-opt: (
+      'strict': false,
       'warn-over': true,
       'warn-duplicates': true,
       'over-only': true,
@@ -73,20 +76,22 @@ $ext-options: (
     ) !global;
 
     // If the developer has set new options($ext-options), merge them with the defaults.
-    @if variable-exists('ext-options') {
+    @if typeof($ext-options) == 'map' {
       $ext-opt: map-merge($ext-opt, $ext-options) !global;
+    } @else {
+      @error 'Seems like `$ext-options` is not a map.';
     }
   }
 
   // FOR EXT()
   // If there is no $ext-budget variable
   @if not variable-exists('ext-budget') {
-    @warn 'You must set you placeholder budgets before using ext().';
+    @error 'You must set you placeholder budgets before using ext().';
   }
 
   // Or no budgets specified
   @else if not length($ext-budget) {
-    @warn 'You must specify at least one budget. Use `total` by default.';
+    @error 'You must specify at least one budget. Use `total` by default.';
   }
 
   // If the placeholder collection hasn't still been created.
@@ -115,7 +120,7 @@ $ext-options: (
   $ret: ();
 
   @if not map-has-key($ext-opt, $option) {
-    @warn 'The option `#{$option}` is not defined or part of the options.';
+    @error 'The option `#{$option}` is not defined or part of the options.';
   } @else {
     $ret: map-get($ext-opt, $option);
   }
@@ -141,9 +146,14 @@ $ext-options: (
   @each $selector in $selectors {
     @if not index($ret, $selector) {
       $ret: append($ret, $selector, 'comma');
-    } @else if ext-get-option('warn-duplicates') {
+    } @else {
       // Warn if duplicated selector
-      @warn 'The selector `#{$selector}` has already been extended for the `%#{$placeholder}` placeholder.';
+      $ext-message: 'The selector `#{$selector}` has already been extended for the `%#{$placeholder}` placeholder.';
+      @if ext-get-option('strict') {
+        @error $ext-message;
+      } @else if ext-get-option('warn-duplicates') {
+        @warn $ext-message;
+      }
     }
   }
 
@@ -227,7 +237,7 @@ $ext-options: (
 @mixin ext($placeholder, $key: 'total', $flag: '') {
   // If there is a parent, it's extendable
   @if not & {
-    @warn 'You can\'t extend outside a selector.';
+    @error 'You can\'t extend outside a selector.';
   } @else {
 
     // Extend would return an error if the placeholder doesn't exist
@@ -268,8 +278,13 @@ $ext-options: (
 
     // Check if it's been overused
     // If there are more placeholder than estimated, warn the user
-    @if length($ext-map-key) > 0 and length(map-get($ext-map-key, $placeholder)) > map-get($ext-budget, $key) and ext-get-option('warn-over') {
-      @warn '`%#{$placeholder}` has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check `#{&}` to prevent that.';
+    @if length($ext-map-key) > 0 and length(map-get($ext-map-key, $placeholder)) > map-get($ext-budget, $key) {
+      $ext-message: '`%#{$placeholder}` has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check `#{&}` to prevent that.';
+      @if ext-get-option('strict') {
+        @error $ext-message;
+      } @else if ext-get-option('warn-over') {
+        @warn $ext-message;
+      }
     }
   }
 }
@@ -304,7 +319,7 @@ $ext-options: (
     // If there's a key filter
     @if $key-filter != 'all' {
       @if not map-has-key($ext-map, $key-filter) {
-        @warn 'Seems like the key `#{$key-filter}` is not on the budget or hasn\'t been used with ext().';
+        @error 'Seems like the key `#{$key-filter}` is not on the budget or hasn\'t been used with ext().';
       } @else {
         $result: ext-list-map($map, $key);
       }
