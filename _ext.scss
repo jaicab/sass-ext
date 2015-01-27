@@ -62,7 +62,6 @@ $ext-options: (
 
 /// Initiates the variables necessary for ext() to work
 @mixin ext-init {
-
   // OPTIONS
   @if not variable-exists('ext-opt') {
     // Default options
@@ -142,7 +141,7 @@ $ext-options: (
   @each $selector in $selectors {
     @if not index($ret, $selector) {
       $ret: append($ret, $selector, 'comma');
-    } @elseif ext-get-option('warn-duplicates') {
+    } @else if ext-get-option('warn-duplicates') {
       // Warn if duplicated selector
       @warn 'The selector `#{$selector}` has already been extended for the `%#{$placeholder}` placeholder.';
     }
@@ -155,7 +154,7 @@ $ext-options: (
 /// Lists a map of placeholders and selectors formatted for pseudoelements
 ///
 /// @param {List} $map - Map formed by a key and a map of (placeholder, selector list)
-/// @param {String} $key - Key to budget and target a specific range of placeholders.
+/// @param {String} $key ['total'] - Key to budget and target a specific range of placeholders.
 ///
 /// @example scss
 ///   $map: (
@@ -167,10 +166,7 @@ $ext-options: (
 ///   $list: ext-list-map($list);
 ///
 /// @returns {String} Returns the info in a visual way as seen on ext-debug();
-@function ext-list-map(
-    $map,
-    $key: 'total'
-  ){
+@function ext-list-map($map, $key: 'total') {
   $ret: '';
 
   // If it's been extended
@@ -219,8 +215,8 @@ $ext-options: (
 /// Custom `@extend` mixin
 ///
 /// @param {String} $placeholder - Placeholder selector to extend (no `%`)
-/// @param {String} $key - Key to budget related with the placeholder.
-/// @param {String} $flag - Room for the !optional flag.
+/// @param {String} $key ['total'] - Key to budget related with the placeholder.
+/// @param {String} $flag [''] - Room for the !optional flag.
 ///
 /// @example scss
 ///   %foo{ color: black; }
@@ -228,12 +224,7 @@ $ext-options: (
 ///      @include ext(foo);
 ///   }
 ///   // No output, but the selectors will be stored in $ext-map.
-@mixin ext(
-  $placeholder,
-  $key: 'total',
-  $flag: ''
-) {
-
+@mixin ext($placeholder, $key: 'total', $flag: '') {
   // If there is a parent, it's extendable
   @if not & {
     @warn 'You can\'t extend outside a selector.';
@@ -276,32 +267,23 @@ $ext-options: (
     }
 
     // Check if it's been overused
-    @if length($ext-map-key) > 0 {
-      // If there are more placeholder than estimated, warn the user
-      //@warn #{map-get($ext-map-key, $placeholder)};
-      @if length(map-get($ext-map-key, $placeholder)) > map-get($ext-budget, $key) {
-        @if ext-get-option('warn-over') {
-          @warn '`%#{$placeholder}` has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check `#{&}` to prevent that.';
-        }
-      }
+    // If there are more placeholder than estimated, warn the user
+    @if length($ext-map-key) > 0 and length(map-get($ext-map-key, $placeholder)) > map-get($ext-budget, $key) and ext-get-option('warn-over') {
+      @warn '`%#{$placeholder}` has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check `#{&}` to prevent that.';
     }
-
   }
 }
 
 /// Debug the results collected by ext() till being called.
 /// IMPORTANT: Should be used at the end of your Sass file in order to cover all your calls to ext().
 ///
-/// @param {String} $key-filter - If specified, limits debug to a single budget. If not, shows all.
+/// @param {String} $key-filter ['all'] - If specified, limits debug to a single budget. If not, shows all.
 ///
 /// @example scss
 ///   @include ext-debug();
 ///   // -> fixed debug info in body:after
-@mixin ext-debug(
-    $key-filter: 'all'
-  ) {
-
-  body:after {
+@mixin ext-debug($key-filter: 'all') {
+  body::after {
     background: #635c92;
     background: rgba(#635c92, 0.9);
     color: #f2f2f2;
