@@ -282,7 +282,7 @@ $ext-options: (
       $ext-message: '`%#{$placeholder}` has been used #{(length(map-get($ext-map-key, $placeholder)) - map-get($ext-budget, $key))} times more than estimated (#{map-get($ext-budget, $key)}). Check `#{&}` to prevent that.';
       @if ext-get-option('strict') {
         @error $ext-message;
-      @else if ext-get-option('warn-over') {
+      } @else if ext-get-option('warn-over') {
         @warn $ext-message;
       }
     }
