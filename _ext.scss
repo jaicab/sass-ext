@@ -1,58 +1,57 @@
 @charset "UTF-8";
 
+////
+/// -------------------------------------------------------------------------------------
+///
+///                            ext(); v1.0 - @extend on a budget
+///
+///                                     jaicab.com/ext/
+///
+/// -------------------------------------------------------------------------------------
+///
+/// List all you extend budgets on the $ext-budget.
+/// It is recommended to have, at least, a default budget call "total".
+/// The total budget would always cover all the placeholders across the system.
+///
+/// You can start using this library like so:
+///
+///   @include ext(my_placeholder);
+///
+/// Then all the placeholders will be counted and you will be warned if any of them surpass the budget.
+///
+/// If you want to create targeted budgets, add another budget to the $ext-budget map.
+/// Then use it like so:
+///
+///   @include ext(my_placeholder, targeted);
+///
+///
+/// 2015 - Made with ♥ by Jaime Caballero (@jaicab_)
+////
 
-// -------------------------------------------------------------------------------------
-//
-//                            ext(); v1.0 - @extend on a budget
-//
-//                                     jaicab.com/ext/
-//
-// -------------------------------------------------------------------------------------
-//
-// List all you extend budgets on the $ext-budget.
-// It is recommended to have, at least, a default budget call "total".
-// The total budget would always cover all the placeholders across the system.
-//
-// You can start using this library like so:
-//
-//   @include ext(my_placeholder);
-//
-// Then all the placeholders will be counted and you will be warned if any of them surpass the budget.
-//
-// If you want to create targeted budgets, add another budget to the $ext-budget map.
-// Then use it like so:
-//
-//   @include ext(my_placeholder, targeted);
-//
-//
-// 2015 - Made with ♥ by Jaime Caballero (@jaicab_)
 
-
-
-// Placeholder budget.
-//
-// In 'total', set the maximun number of times you want a placeholder to be used.
-// If you want to add custom budgets, add another one right after total.
-// Total is a keyword, so it will always count all the placeholders, no matter the target.
-//
-// Should be put with your other variables, before the mixins.
-// @type Map
+/// Placeholder budget.
+/// Should be put with your other variables, before the mixins.
+///
+/// In 'total', set the maximun number of times you want a placeholder to be used.
+/// If you want to add custom budgets, add another one right after total.
+/// Total is a keyword, so it will always count all the placeholders, no matter the target.
+///
+/// @type Map
 $ext-budget: (
   'total': 15,
   'heading': 12
 ) !default;
 
 
-// Options
-//
-// The options available are:
-//   - warn-over {Bool} (Default: true): Warns you when a placeholder has been used more than budgeted.
-//   - warn-duplicates {Bool} (Default: true): Warn when you use a placeholder in the same selector more than once.
-//   - over-only {Bool} (Default: true): For placeholders on debug. Only show placeholders over the budget.
-//   - show-all {Bool} (Default: true): For budgets debug. List an expanded version of all the used budgets, no matter of the results.
-//
-// Should be put with your other variables, before the mixins.
-// @type Map
+/// Options
+/// Should be put with your other variables, before the mixins.
+///
+/// @prop {Bool} warn-over [true] - Warns you when a placeholder has been used more than budgeted.
+/// @prop {Bool} warn-duplicates [true] - Warn when you use a placeholder in the same selector more than once.
+/// @prop {Bool} over-only [true] - For placeholders on debug. Only show placeholders over the budget.
+/// @prop {Bool} show-all [true] - For budgets debug. List an expanded version of all the used budgets, no matter of the results.
+///
+/// @type Map
 $ext-options: (
   'warn-over': true,
   'warn-duplicates': true,
@@ -61,8 +60,8 @@ $ext-options: (
 ) !default;
 
 
-//Initiates the variables necessary for ext() to work
-@mixin ext-init() {
+/// Initiates the variables necessary for ext() to work
+@mixin ext-init {
 
   // OPTIONS
   @if not variable-exists('ext-opt') {
@@ -104,15 +103,15 @@ $ext-options: (
 }
 
 
-// Gets an option from the options map
-//
-// @param {String} $option - Name of the option
-//
-// @example scss
-//   ext-get-option(warn-duplicated);
-//   // -> true
-//
-// @returns {List} $selectors - List of selectors without duplications
+/// Gets an option from the options map
+///
+/// @param {String} $option - Name of the option
+///
+/// @example scss
+///   ext-get-option(warn-duplicated);
+///   // -> true
+///
+/// @returns {List} List of selectors without duplications
 @function ext-get-option($option) {
   $ret: ();
 
@@ -126,17 +125,17 @@ $ext-options: (
 }
 
 
-// Removes duplicates from a Sass list and joins them with commas
-//
-// @param {List} $selectors - List of selectors
-// @param {String} $placeholder - Used placeholder. Displayed on @warn.
-//
-// @example scss
-//   $list: html, .foo, body, .foo, form;
-//   $list: ext-remove-duplicates($list);
-//   // -> html, .foo, body, form
-//
-// @returns {List} $selectors - List of selectors without duplications
+/// Removes duplicates from a Sass list and joins them with commas
+///
+/// @param {List} $selectors - List of selectors
+/// @param {String} $placeholder - Used placeholder. Displayed on @warn.
+///
+/// @example scss
+///   $list: html, .foo, body, .foo, form;
+///   $list: ext-remove-duplicates($list);
+///   // -> html, .foo, body, form
+///
+/// @returns {List} List of selectors without duplications
 @function ext-remove-duplicates($selectors, $placeholder) {
   $ret: ();
 
@@ -153,21 +152,21 @@ $ext-options: (
 }
 
 
-// Lists a map of placeholders and selectors formatted for pseudoelements
-//
-// @param {List} $map - Map formed by a key and a map of (placeholder, selector list)
-// @param {String} $key - Key to budget and target a specific range of placeholders.
-//
-// @example scss
-//   $map: (
-//     total: (
-//        %foo: html, div,
-//        ...
-//     )
-//   )
-//   $list: ext-list-map($list);
-//
-// @returns {String} - Returns the info in a visual way as seen on ext-debug();
+/// Lists a map of placeholders and selectors formatted for pseudoelements
+///
+/// @param {List} $map - Map formed by a key and a map of (placeholder, selector list)
+/// @param {String} $key - Key to budget and target a specific range of placeholders.
+///
+/// @example scss
+///   $map: (
+///     total: (
+///        %foo: html, div,
+///        ...
+///     )
+///   )
+///   $list: ext-list-map($list);
+///
+/// @returns {String} Returns the info in a visual way as seen on ext-debug();
 @function ext-list-map(
     $map,
     $key: 'total'
@@ -217,24 +216,23 @@ $ext-options: (
 }
 
 
-// Custom @extend mixin
-//
-// @param {String} $placeholder - Placeholder selector to extend (no %)
-// @param {String} $key - Key to budget related with the placeholder.
-// @param {String} $flag - Room for the !optional flag.
-//
-// @example scss
-//   %foo{ color: black; }
-//   .something{
-//      @include ext(foo);
-//   }
-//   // No output, but the selectors will be stored in $ext-map.
-//
+/// Custom `@extend` mixin
+///
+/// @param {String} $placeholder - Placeholder selector to extend (no `%`)
+/// @param {String} $key - Key to budget related with the placeholder.
+/// @param {String} $flag - Room for the !optional flag.
+///
+/// @example scss
+///   %foo{ color: black; }
+///   .something{
+///      @include ext(foo);
+///   }
+///   // No output, but the selectors will be stored in $ext-map.
 @mixin ext(
-    $placeholder,
-    $key: 'total',
-    $flag: ''
-  ) {
+  $placeholder,
+  $key: 'total',
+  $flag: ''
+) {
 
   // If there is a parent, it's extendable
   @if not & {
@@ -291,15 +289,14 @@ $ext-options: (
   }
 }
 
-// Debug the results collected by ext() till being called.
-// IMPORTANT: Should be used at the end of your Sass file in order to cover all your calls to ext().
-//
-// @param {String} $key-filter - If specified, limits debug to a single budget. If not, shows all.
-//
-// @example scss
-//   @include ext-debug();
-//   // -> fixed debug info in body:after
-//
+/// Debug the results collected by ext() till being called.
+/// IMPORTANT: Should be used at the end of your Sass file in order to cover all your calls to ext().
+///
+/// @param {String} $key-filter - If specified, limits debug to a single budget. If not, shows all.
+///
+/// @example scss
+///   @include ext-debug();
+///   // -> fixed debug info in body:after
 @mixin ext-debug(
     $key-filter: 'all'
   ) {
