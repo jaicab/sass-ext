@@ -76,7 +76,7 @@ $ext-options: (
     ) !global;
 
     // If the developer has set new options($ext-options), merge them with the defaults.
-    @if typeof($ext-options) == 'map' {
+    @if type-of($ext-options) == 'map' {
       $ext-opt: map-merge($ext-opt, $ext-options) !global;
     } @else {
       @error 'Seems like `$ext-options` is not a map.';
