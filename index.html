@@ -15,14 +15,6 @@
 	<meta property="og:title" content="The ext(); mixin" />
 	<meta property="og:url" content="http://jaicab.com/ext/" />
 
-	<script src="//ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js"></script>
-	<script>
-	  WebFont.load({
-	    google: {
-	      families: ['Bigshot One']
-	    }
-	  });
-	</script>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body itemscope itemtype="http://schema.org/Thing">
@@ -109,7 +101,7 @@
 			<p>Well, <code>ext();</code> will do this and much more for you. It'll give you the functionality and control you would expect from <code>@extend</code>. This is how it looks like:</p>
 <pre>
 $ext-budget: (
-	total: 10
+	'total': 10
 );
 
 %foo{ color: #000; }
@@ -134,7 +126,7 @@ bower install ext --save
 			<p>Then, on your defaults file (<code>_defaults.scss</code>, <code>_vars.scss</code>, etc.) you need to set up your <strong>selector budget</strong> (<code>$ext-budget</code>).
 <pre>
 $ext-budget: (
-	total: 15
+	'total': 15
 );
 </pre>
 			<p>Here you must set the <b>maximun number</b> of selectors you want any placeholder to be limited to be extended. And you are ready to go! Start extending your placeholders like so:</p>
@@ -159,9 +151,9 @@ $ext-budget: (
 			<p>Although <code>total</code> is the initial budget, you may want to have different budgets for different placeholders, like headings, which easily have 6 selectors as a minimun. Therefore can add more to <code>$ext-budget</code> like so:</p>
 <pre>
 $ext-budget: (
-	total: 15,
-	headings: 12,
-	forms: 10
+	'total': 15,
+	'headings': 12,
+	'forms': 10
 );
 </pre>
 			<p>By default, <code>ext();</code> will <b>always count an extension in the <code>total</code> budget</b> to get a generic idea all across the site. If you don't want this to happen, just remove it from the budget map.</p>
@@ -214,14 +206,16 @@ $ext-budget: (
 
 <pre>
 $ext-options: (
-  warn-over: true,
-  warn-duplicates: true,
-  over-only: true,
-  show-all: true
+  'strict': false,
+  'warn-over': true,
+  'warn-duplicates': true,
+  'over-only': true,
+  'show-all': true
 );
 </pre>
 			<p>There is no need yo use them all or to keep them in that same order. Changing these values would affect in:</p>
 			<ul>
+				<li><code>strict</code> {Bool} (Default: false): For strict development. Overrides the optional warnings and throws and error on all warning scenarios.</li>
 				<li><code>warn-over</code> {Bool} (Default: true): Warns you when a placeholder has been used more than budgeted.</li>
 				<li><code>warn-duplicates</code> {Bool} (Default: true): Warn when you use a placeholder in the same selector more than once.</li>
 				<li><code>over-only</code> {Bool} (Default: true): For placeholders on debug. Only show placeholders over the budget.</li>
@@ -250,6 +244,14 @@ $ext-options: (
 		</div>
 	</footer>
 
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js"></script>
+<script>
+  WebFont.load({
+    google: {
+      families: ['Bigshot One']
+    }
+  });
+</script>
 
 </body>
 </html>
