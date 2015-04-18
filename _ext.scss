@@ -5,7 +5,7 @@
 ///
 ///                            ext(); v1.0 - @extend on a budget
 ///
-///                                     jaicab.com/ext/
+///                                   jaicab.com/sass-ext/
 ///
 /// -------------------------------------------------------------------------------------
 ///
@@ -314,7 +314,7 @@ $ext-options: (
     display: block;
 
     // Loop through the keys
-    $result: '# ext() v1.0       jaicab.com/ext/\A\A';
+    $result: '# ext() v1.0       jaicab.com/sass-ext/\A\A';
 
     // If there's a key filter
     @if $key-filter != 'all' {
@@ -330,7 +330,7 @@ $ext-options: (
       }
     }
 
-    @if $result == '# ext() v1.0       jaicab.com/ext/\A\A'{
+    @if $result == '# ext() v1.0       jaicab.com/sass-ext/\A\A'{
       $result: '#{$result} Nothing to see here. Play with show-all and over-only options to see everything.\A\A ';
     }
 
